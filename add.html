@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam Scores</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Add Exam Score</h1>
+      <form>
+        <form>
+          <fieldset>
+            <label for="name">Name</label>
+            <input type="text" placeholder="CJ Patoilo" id="name" maxlength="255">
+            <label for="subject">Subject</label>
+            <select id="subject">
+              <option value="Matematika">Matematika</option>
+              <option value="Istorija">Istorija</option>
+              <option value="Fizika">Fizika</option>
+              <option value="Chemija">Chemija</option>
+            </select>
+            <label for="module">Module</label>
+            <select id="module">
+              <option value="A1">A1</option>
+              <option value="A2">A2</option>
+              <option value="B1">B1</option>
+              <option value="B2">B2</option>
+            </select>
+            <label for="score">Score</label>
+            <input type="number" placeholder="from 0 to 100" id="score" max="100" min="0">
+            <input class="button-primary" type="submit" value="Add Score">
+            <a href="index.html" class="button">View Scores</a>
+          </fieldset>
+        </form>
+      </form>
+      </div>
+    </div>
+    <script>
+      const url = "http://127.0.0.1:3000";
+
+      document.forms[0].addEventListener("submit", (e) => {
+        e.preventDefault();
+        // console.log(document.getElementById("name").value,
+        //     document.getElementById("subject").value,
+        //     document.getElementById("module").value,
+        //     document.getElementById("score").value);
+
+        fetch(url + "/add", {
+          method: "POST",
+          headers: { "Content-Type" : "application/json"},
+          body: JSON.stringify({
+            name: document.getElementById("name").value.trim(" "),
+            subject: document.getElementById("subject").value,
+            module: document.getElementById("module").value,
+            score: Number(document.getElementById("score").value),
+          })
+        }).then(res => console.log(res))
+        .catch((err) => console.log("Erroras: " + err))
+      })
+    </script>
+  </body>
+</html>

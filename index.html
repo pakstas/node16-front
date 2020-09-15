@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Exam Scores</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>EXAM Scores!</h1>
+      <div class="table">
+        <table>
+          <thead>
+            <tr>
+              <th>
+                Name<input
+                  class="input"
+                  name="name"
+                  type="text"
+                  placeholder="Filter by name.."
+                />
+              </th>
+              <th>Subject<select name="subject"></select></th>
+              <th>Module<select name="module"></select></th>
+              <th>
+                Score<button class="button button-outline" id="sort">
+                  Asc
+                </button>
+              </th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        <a href="add.html" class="button">Add Score</a>
+      </div>
+    </div>
+
+    <script>
+      const url = "http://127.0.0.1:3000";
+      const table = document.querySelector("tbody");
+      const sortBtn = document.querySelector("#sort");
+
+      function displayPeople(data) {
+        table.innerHTML = "";
+        data.forEach((item) => {
+          const tr = table.insertRow();
+          const td1 = tr.insertCell();
+          td1.textContent = item.name;
+          const td2 = tr.insertCell();
+          td2.textContent = item.subject;
+          const td3 = tr.insertCell();
+          td3.textContent = item.module;
+          const td4 = tr.insertCell();
+          td4.textContent = item.score + "%";
+          const td5 = tr.insertCell();
+          const btn = document.createElement("button");
+          btn.className = "delete";
+          btn.textContent = "X";
+          btn.addEventListener("click", (e) => {
+            fetch(`http://127.0.0.1:3000/delete/${item.id}`, {
+              method: "DELETE",
+            })
+              .then(() => table.removeChild(tr))
+              .catch((err) => console.log(err));
+          });
+          td5.append(btn);
+        });
+      }
+
+      fetch(url + "/people/")
+        .then((response) => response.json())
+        .then((data) => {
+          displayPeople(data);
+          sortBtn.addEventListener("click", () => {
+            if (sortBtn.textContent === "Asc") {
+              displayPeople(data.sort((a, b) => a.score - b.score));
+              sortBtn.textContent = "Desc";
+            } else {
+              displayPeople(data.sort((a, b) => b.score - a.score));
+              sortBtn.textContent = "Asc";
+            }
+          });
+        })
+        .catch((err) => console.log(err));
+
+      fetch(url + "/subjects")
+        .then((res) => res.json())
+        .then((data) => {
+          const select = document.querySelector("select");
+
+          data.forEach((item) => {
+            const option = document.createElement("option");
+            option.textContent = item.subject;
+            option.value = item.subject;
+            select.append(option);
+          });
+        });
+
+      fetch(url + "/modules")
+        .then((res) => res.json())
+        .then((data) => {
+          const select = document.querySelectorAll("select")[1];
+
+          data.forEach((item) => {
+            const option = document.createElement("option");
+            option.textContent = item.module;
+            option.value = item.module;
+            select.append(option);
+          });
+        });
+
+      document
+        .querySelector("input[name=name]")
+        .addEventListener("keyup", (e) => {
+          if (e.key === "Enter") {
+            fetch(url + "/people/" + e.target.value)
+              .then((response) => response.json())
+              .then((data) => displayPeople(data));
+          }
+        });
+    </script>
+  </body>
+</html>
